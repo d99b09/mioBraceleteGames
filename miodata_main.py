@@ -8,7 +8,7 @@ class Mio_API_get_data(Thread):
     def __init__(self):
         super(Mio_API_get_data, self).__init__()
         self.ser = serial.Serial()
-        self.ser.port = ''
+        self.ser.port = 'COM6'
         self.ser.baudrate = 115200
         self.decode_message1 = {'x': 0, 'y': 0, 's': 0}  # new decode fun
         self.decode_message2 = {'x': 0, 'y': 0, 's': 0}  # new decode fun
@@ -25,16 +25,16 @@ class Mio_API_get_data(Thread):
                 i_list.append(int(i))
             except:
                 pass
-        if i_list[0] == 48:
+        if i_list[1]:
             self.decode_message1['y'] = i_list[2]
             self.decode_message1['x'] = i_list[3]
-        elif i_list[0] == 49:
+        else:
             self.decode_message2['y'] = i_list[2]
             self.decode_message2['x'] = i_list[3]
-        elif i_list[0] == 144:
-            self.decode_message1['s'] = i_list[4]
-        elif i_list[0] == 145:
-            self.decode_message2['s'] = i_list[4]
+        # elif i_list[0] == 144:
+        #     self.decode_message1['s'] = i_list[4]
+        # elif i_list[0] == 145:
+        #     self.decode_message2['s'] = i_list[4]
         return self.decode_message1, self.decode_message2
 
     def run(self) -> None:
@@ -52,6 +52,7 @@ class Mio_API_get_data(Thread):
                     try:
                         m1, m2 = self.string_to_json(line)
                         message = {'r': m1, 'l': m2}
+                        print(message)
                         msg = json.dumps(message)
                         self.send_msg(msg)
                     except:
@@ -61,6 +62,7 @@ class Mio_API_get_data(Thread):
                 self.ser.close()
 
     def send_msg(self, msg):
+        self.client.connect(('localhost', 8888))
         self.client.send(msg.encode())
         self.client.close()
 
