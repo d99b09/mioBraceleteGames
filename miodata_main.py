@@ -13,7 +13,6 @@ class Mio_API_get_data(Thread):
         self.decode_message1 = {'x': 0, 'y': 0, 's': 0}  # new decode fun
         self.decode_message2 = {'x': 0, 'y': 0, 's': 0}  # new decode fun
         print('init')
-        self.client = socket.socket()
 
 
     def string_to_json(self, line):
@@ -29,8 +28,8 @@ class Mio_API_get_data(Thread):
             self.decode_message1['y'] = i_list[2]
             self.decode_message1['x'] = i_list[3]
         else:
-            self.decode_message2['y'] = i_list[2]
-            self.decode_message2['x'] = i_list[3]
+            self.decode_message2['x'] = -i_list[2]
+            self.decode_message2['y'] = i_list[3]
         # elif i_list[0] == 144:
         #     self.decode_message1['s'] = i_list[4]
         # elif i_list[0] == 145:
@@ -62,6 +61,7 @@ class Mio_API_get_data(Thread):
                 self.ser.close()
 
     def send_msg(self, msg):
+        self.client = socket.socket()
         self.client.connect(('localhost', 8888))
         self.client.send(msg.encode())
         self.client.close()
